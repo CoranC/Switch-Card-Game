@@ -80,22 +80,33 @@ export default class Game {
         validResponse = false;
         continue;
       }
-      if (isNaN(Number(response))) {
-        Logger.logColor("Invalid value.", Colors.red);
-        validResponse = false;
+      response = response.replace(/\s+/g, "");
+      if (response.length === 1 && response.toLowerCase() === "p") {
+        validResponse = true;
         continue;
-      } else if (Number(response) && Number(response) > cardCount - 1) {
-        Logger.logColor(
-          `Referee: The indexes only go up to ${cardCount -
-            1} for this player.`,
-          Colors.red,
-        );
-        validResponse = false;
-        continue;
+      } else if (/(\d,?)+/.test(response)) {
+        // checks if comma seperated indexes are valid.
+        const indexValues = response.split(",");
+        let indexesAreCorrect = true;
+        for (const index of indexValues) {
+          if (Number(index) > cardCount - 1) {
+            if (indexesAreCorrect) {
+              indexesAreCorrect = false;
+            }
+          }
+        }
+        if (!indexesAreCorrect) {
+          Logger.logColor(
+            `Referee: The indexes only go up to ${cardCount -
+              1} for this player.`,
+            Colors.red,
+          );
+          validResponse = false;
+          continue;
+        }
       }
       validResponse = true;
     }
-    response = response.replace(/\s+/g, "");
     return response;
   }
 
